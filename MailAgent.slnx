@@ -1,3 +1,6 @@
 <Solution>
   <Project Path="MailAgent.API/MailAgent.API.csproj" />
+  <Project Path="MailAgent.Application/MailAgent.Application.csproj" />
+  <Project Path="MailAgent.Database/MailAgent.Database.csproj" />
+  <Project Path="MailAgent.Model/MailAgent.Model.csproj" />
 </Solution>
