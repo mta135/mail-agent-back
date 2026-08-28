@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="SendEmailWorker\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MailAgent.Database\MailAgent.Database.csproj" />
+  </ItemGroup>
+
 </Project>

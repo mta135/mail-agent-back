@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MailAgent.Model\MailAgent.Model.csproj" />
+  </ItemGroup>
+
 </Project>
