@@ -1,8 +1,13 @@
+using MailAgent.Application.SendEmailWorker;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<IEmailChannel, EmailChannel>();
+builder.Services.AddHostedService<EmailBackgroundWorker>();
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

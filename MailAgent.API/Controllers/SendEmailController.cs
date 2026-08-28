@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MailAgent.Application.SendEmailWorker;
+using MailAgent.Model.EmailMessage;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MailAgent.API.Controllers
@@ -7,11 +9,23 @@ namespace MailAgent.API.Controllers
     [ApiController]
     public class SendEmailController : ControllerBase
     {
+        private readonly IEmailChannel _emailChannel;
+
+        public SendEmailController(IEmailChannel emailChannel)
+        {
+            _emailChannel = emailChannel;
+        }
 
         [HttpPost]
-        public IActionResult SendEmail()
+        public async Task<IActionResult> SendEmail(EmailMessageModel model)
         {
-            return Ok("Email sent successfully!");
+            await _emailChannel.Writer.WriteAsync(model);
+
+            return Accepted(new
+            {
+                Message = "Mesajul a fost pus în coadă.",
+                
+            });
         }
     }
 }
