@@ -8,7 +8,9 @@ namespace MailAgent.Application.SendEmailWorker
 {
     public interface IEmailChannel
     {
+
         ChannelWriter<EmailMessageModel> Writer { get; }
+
         ChannelReader<EmailMessageModel> Reader { get; }
     }
 }
