@@ -86,7 +86,11 @@ namespace MailAgent.DataBaseAccess.Contex
             modelBuilder.Entity<EmailMessageTo>().Property(t => t.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired(false);
             modelBuilder.Entity<EmailMessageTo>().Property(t => t.To).HasColumnName("to").HasColumnType("nvarchar(100)").IsRequired(false).HasMaxLength(100);
 
-            modelBuilder.Entity<EmailMessageTo>().HasOne<EmailMessage>().WithMany().HasForeignKey(t => t.EmailMessageId).IsRequired(false);
+            modelBuilder.Entity<EmailMessageTo>().HasOne(t => t.EmailMessage).WithMany(m => m.EmailMessageTos).HasForeignKey(t => t.EmailMessageId).OnDelete(DeleteBehavior.Cascade)
+                .IsRequired(false);
+
+
+
 
         }
 

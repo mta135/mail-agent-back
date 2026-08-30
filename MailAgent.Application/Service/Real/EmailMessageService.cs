@@ -45,19 +45,14 @@ namespace MailAgent.Application.Service
                     EmailMessageTos = email.To?.ConvertAll(to => new EmailMessageTo
                     {
                         To = to.ToString(),
-                        EmailMessageId = emailId
                     }) ?? [],
 
                     Copies = email.Copy?.ConvertAll(copy => new EmailMessageCopy
                     {
                         Copy = copy.ToString(),
-                        EmailMessageId = emailId
                     }) ?? [],
 
-
-
                 };
-            
 
                 if (email.Attachments.Count > 0)
                 {
@@ -68,7 +63,6 @@ namespace MailAgent.Application.Service
                     }
                 }
 
-             
                 await _emailRepository.SaveInitialMessageAsync(emailMessage);
             }
             catch (Exception)
