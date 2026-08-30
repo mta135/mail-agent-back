@@ -24,10 +24,9 @@ namespace MailAgent.API.Controllers
         public async Task<IActionResult> SendEmail([FromForm] EmailMessageModel model)
         {
 
-            await _emailMessageService.SaveInitialMessageAsync(model);
+            Guid emailId = await _emailMessageService.SaveInitialMessageAsync(model);
 
-
-            await _emailChannel.WriteAsync(model);
+            await _emailChannel.WriteAsync(emailId);
 
             //await _emailChannel.Writer.WriteAsync(model);
 

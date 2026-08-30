@@ -9,37 +9,37 @@ namespace MailAgent.Application.SendEmailWorker
 {
     public class EmailChannel : IEmailChannel
     {
-        private readonly Channel<EmailMessageModel> _channel = Channel.CreateBounded<EmailMessageModel>(new BoundedChannelOptions(1000)
+        private readonly Channel<Guid> _channel = Channel.CreateBounded<Guid>(new BoundedChannelOptions(1000)
         {
             FullMode = BoundedChannelFullMode.Wait,
             SingleReader = true
         });
 
-        public ChannelWriter<EmailMessageModel> Writer
-        {
-            get { return _channel.Writer; }
-        }
+        //public ChannelWriter<EmailMessageModel> Writer
+        //{
+        //    get { return _channel.Writer; }
+        //}
 
 
-        public ChannelReader<EmailMessageModel> Reader
-        {
-            get { return _channel.Reader; }
-        }
+        //public ChannelReader<EmailMessageModel> Reader
+        //{
+        //    get { return _channel.Reader; }
+        //}
 
 
 
 
-        public ValueTask WriteAsync(EmailMessageModel message, CancellationToken ct = default)
+        public ValueTask WriteAsync(Guid message, CancellationToken ct = default)
         {
             return _channel.Writer.WriteAsync(message, ct);
         }
 
 
-        public IAsyncEnumerable<EmailMessageModel> ReadAllAsync(CancellationToken ct = default)
+        public IAsyncEnumerable<Guid> ReadAllAsync(CancellationToken ct = default)
         {
             return _channel.Reader.ReadAllAsync(ct);
         }
-           
 
+   
     }
 }

@@ -9,13 +9,13 @@ namespace MailAgent.Application.SendEmailWorker
     public interface IEmailChannel
     {
 
-        ChannelWriter<EmailMessageModel> Writer { get; }
+        //ChannelWriter<EmailMessageModel> Writer { get; }
 
-        ChannelReader<EmailMessageModel> Reader { get; }
+        //ChannelReader<EmailMessageModel> Reader { get; }
 
 
-        ValueTask WriteAsync(EmailMessageModel message, CancellationToken ct = default);
+        ValueTask WriteAsync(Guid emailId, CancellationToken ct = default);
 
-        IAsyncEnumerable<EmailMessageModel> ReadAllAsync(CancellationToken ct = default);
+        IAsyncEnumerable<Guid> ReadAllAsync(CancellationToken ct = default);
     }
 }
