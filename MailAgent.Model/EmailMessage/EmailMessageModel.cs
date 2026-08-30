@@ -17,16 +17,11 @@ namespace MailAgent.Model.EmailMessage
 
         public string Footer { get; set; } = string.Empty;
 
-        //public List<EmailMessageToModel> EmailMessageTo { get; set; } = [];
-
         public List<string> To { get; set; } = [];
-
-        //public List<EmailMessageAttachmentModel> Attachments { get; set; } = [];
 
         public List<string> Copy { get; set; } = [];
 
         public List<IFormFile> Attachments { get; set; } = new();
 
-        //public List<EmailMessageCopyModel> Copy { get; set; } = [];
     }
 }

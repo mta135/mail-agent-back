@@ -11,9 +11,13 @@ namespace MailAgent.Application.SendEmailWorker
     {
         private readonly IEmailChannel _emailChannel;
 
+        private readonly SemaphoreSlim _semaphore;
+        private readonly List<Task> _runningTasks = new();
+
         public EmailBackgroundWorker(IEmailChannel emailChannel)
         {
             _emailChannel = emailChannel;
+            _semaphore = new SemaphoreSlim(initialCount: 5, maxCount: 5);
         }
 
 
