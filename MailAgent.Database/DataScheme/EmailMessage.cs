@@ -18,9 +18,9 @@ namespace MailAgent.DataBaseAccess.DataScheme
 
         public string Footer { get; set; } = string.Empty;
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
-        public int Status { get; set; } = 0; // 0 - Pending, 1 - Sent, 2 - Failed
+        public int? Status { get; set; } = 0; // 0 - Pending, 1 - Sent, 2 - Failed
 
 
         public virtual ICollection<EmailMessageTo> EmailMessageTos { get; set; } = new List<EmailMessageTo>();

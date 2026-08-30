@@ -28,55 +28,62 @@ namespace MailAgent.Application.Service
             {
                 emailId = Guid.NewGuid();
 
-                EmailMessage emailMessage = new EmailMessage();
-
-                emailMessage.Id = emailId;
-
-                emailMessage.From = email.From;
-                emailMessage.Header = email.Header;
-
-                emailMessage.Subject = email.Subject;
-                emailMessage.Body = email.Body;
-                emailMessage.Footer = email.Footer;
-
-                emailMessage.CreatedAt = DateTime.UtcNow;
-                emailMessage.Status = (int)EmailSendStatusEnum.Pending;
-
-                emailMessage.EmailMessageTos = email.EmailMessageTo.ConvertAll(to => new EmailMessageTo()
+                EmailMessage emailMessage = new EmailMessage
                 {
-                    To = to.To
-                });
+                    Id = emailId,
 
-                if (email.Copy.Count > 0)
-                {
-                    emailMessage.Copies = email.Copy.ConvertAll(copy => new EmailMessageCopy
+                    From = email.From,
+                    Header = email.Header,
+
+                    Subject = email.Subject,
+                    Body = email.Body,
+                    Footer = email.Footer,
+
+                    CreatedAt = DateTime.UtcNow,
+                    Status = (int)EmailSendStatusEnum.Pending,
+
+                    /*
+
+                    EmailMessageTos = email.To?.ConvertAll(to => new EmailMessageTo
                     {
-                        Copy = copy.Copy
-                    });
-                }
+                        To = to.ToString(),
+                        EmailMessageId = emailId
+                    }) ?? [],
 
-                if(email.Attachments.Count > 0)
-                {
-                    for(int i = 0; i < email.Attachments.Count; i++)
+                    Copies = email.Copy?.ConvertAll(copy => new EmailMessageCopy
                     {
-                        EmailMessageAttachmentModel attachments = email.Attachments[i];
-                        EmailMessageAttachment emailMessageAttachment = await ProcessFileAsync(attachments.File);
+                        Copy = copy.ToString(),
+                        EmailMessageId = emailId
+                    }) ?? [],
 
+                    */
+
+                };
+                /*
+
+                if (email.Attachments.Count > 0)
+                {
+                    for (int i = 0; i < email.Attachments.Count; i++)
+                    {
+                        EmailMessageAttachment emailMessageAttachment = await ProcessFileAsync(email.Attachments[i], emailId);
                         emailMessage.Attachments.Add(emailMessageAttachment);
                     }
                 }
 
-                await _emailRepository.SaveInitialMessageAsync(emailMessage);
+                */
 
-            } catch(Exception ex)
+                await _emailRepository.SaveInitialMessageAsync(emailMessage);
+            }
+            catch (Exception)
             {
-                string errorMessage = $"Error saving initial message: {ex.Message}";
+                // propagate so caller/upper layers can observe the underlying DB error (e.g. missing FK column)
+                throw;
             }
 
             return emailId;
         }
 
-        public async Task<EmailMessageAttachment> ProcessFileAsync(IFormFile file)
+        public async Task<EmailMessageAttachment> ProcessFileAsync(IFormFile file, Guid emailId)
         {
 
             string contentType = file.ContentType;
@@ -96,6 +103,7 @@ namespace MailAgent.Application.Service
             // Mapezi direct în entitatea ta de EF Core:
             var attachmentEntity = new EmailMessageAttachment
             {
+                EmailMessageId = emailId,
                 FileName = fileName,
                 ContentType = contentType,
 

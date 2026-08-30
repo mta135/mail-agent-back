@@ -3,6 +3,7 @@ using MailAgent.Application.Service;
 using MailAgent.Application.Service.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Real;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,15 +17,42 @@ builder.Services.AddScoped<IEmailMessageService, EmailMessageService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
+
+
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "Dita EstFarm",
+        Description = "FFAppMiddleware Project. ASP.NET Web API",
+        Contact = new OpenApiContact
+        {
+            Name = ".Net Developer: Mihai Tamazlîcaru",
+            Email = string.Empty,
+            Url = new Uri("https://twitter.com/spboyer"),
+        },
+        License = new OpenApiLicense
+        {
+            Name = "Dita EstFarm Licence",
+            Url = new Uri("https://example.com/license"),
+        },
+    });
+
+});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    //app.MapOpenApi();
+    //app.MapScalarApiReference();
+
+    app.UseSwagger(); // Generates the JSON endpoints
+    app.UseSwaggerUI(); // Serves the interactive HTML UI
 }
 
 app.UseHttpsRedirection();
