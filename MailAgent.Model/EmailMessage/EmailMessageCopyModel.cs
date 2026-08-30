@@ -4,8 +4,9 @@ using System.Text;
 
 namespace MailAgent.Model.EmailMessage
 {
-    public class EmailMessageToModel
+    public class EmailMessageCopyModel
     {
-        public string To { get; set; } = string.Empty;
+        public string Copy { get; set; }  = string.Empty;
+
     }
 }

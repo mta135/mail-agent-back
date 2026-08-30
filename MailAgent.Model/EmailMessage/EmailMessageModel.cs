@@ -19,5 +19,7 @@ namespace MailAgent.Model.EmailMessage
         public List<EmailMessageToModel> EmailMessageTo { get; set; } = [];
 
         public List<EmailMessageAttachmentModel> Attachments { get; set; } = [];
+
+        public List<EmailMessageCopyModel> Copy { get; set; } = [];
     }
 }

@@ -6,9 +6,6 @@ namespace MailAgent.Model.EmailMessage
 {
     public class EmailMessageAttachmentModel
     {
-
-        public Guid EmailMessageId { get; set; }
-
         public string FileName { get; set; } = string.Empty;
 
         public string? ContentType { get; set; }
