@@ -12,5 +12,10 @@ namespace MailAgent.Application.SendEmailWorker
         ChannelWriter<EmailMessageModel> Writer { get; }
 
         ChannelReader<EmailMessageModel> Reader { get; }
+
+
+        ValueTask WriteAsync(EmailMessageModel message, CancellationToken ct = default);
+
+        IAsyncEnumerable<EmailMessageModel> ReadAllAsync(CancellationToken ct = default);
     }
 }

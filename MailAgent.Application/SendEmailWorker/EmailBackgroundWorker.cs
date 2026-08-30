@@ -21,7 +21,7 @@ namespace MailAgent.Application.SendEmailWorker
         {
             try
             {
-                await foreach (var email in _emailChannel.Reader.ReadAllAsync(stoppingToken))
+                await foreach (var email in /*_emailChannel.Reader.ReadAllAsync(stoppingToken)*/  _emailChannel.ReadAllAsync(stoppingToken))
                 {
                     try
                     {

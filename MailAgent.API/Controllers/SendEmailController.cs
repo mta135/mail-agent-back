@@ -19,7 +19,9 @@ namespace MailAgent.API.Controllers
         [HttpPost]
         public async Task<IActionResult> SendEmail(EmailMessageModel model)
         {
-            await _emailChannel.Writer.WriteAsync(model);
+            await _emailChannel.WriteAsync(model);
+
+            //await _emailChannel.Writer.WriteAsync(model);
 
             return Accepted(new
             {
