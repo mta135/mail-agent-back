@@ -18,7 +18,7 @@ namespace MailAgent.DataBaseAccess.DataScheme
 
         public string Footer { get; set; } = string.Empty;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
 
         public int Status { get; set; } = 0; // 0 - Pending, 1 - Sent, 2 - Failed
 

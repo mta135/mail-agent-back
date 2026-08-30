@@ -7,6 +7,6 @@ namespace MailAgent.Application.Service.Abstract
 {
     public interface IEmailMessageService
     {
-        Task SaveInitialMessageAsync(EmailMessageModel email);
+        Task<Guid> SaveInitialMessageAsync(EmailMessageModel email);
     }
 }

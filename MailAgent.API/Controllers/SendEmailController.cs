@@ -21,13 +21,10 @@ namespace MailAgent.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendEmail(EmailMessageModel model)
+        public async Task<IActionResult> SendEmail([FromForm] EmailMessageModel model)
         {
 
-
             await _emailMessageService.SaveInitialMessageAsync(model);
-
-
 
 
             await _emailChannel.WriteAsync(model);

@@ -8,7 +8,7 @@ namespace MailAgent.Model.EmailMessage
 {
     public class EmailMessageAttachmentModel
     {
-        public string Description { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
 
         public IFormFile File { get; set; } = null!;
 
