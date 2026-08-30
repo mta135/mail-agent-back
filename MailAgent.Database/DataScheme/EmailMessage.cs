@@ -27,5 +27,7 @@ namespace MailAgent.DataBaseAccess.DataScheme
 
         public virtual ICollection<EmailMessageAttachment> Attachments { get; set; } = new List<EmailMessageAttachment>();
 
+        public virtual ICollection<EmailMessageCopy> Copies { get; set; } = new List<EmailMessageCopy>();
+
     }
 }

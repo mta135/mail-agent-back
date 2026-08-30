@@ -1,20 +1,16 @@
 ﻿ using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace MailAgent.Model.EmailMessage
 {
     public class EmailMessageAttachmentModel
     {
-        public string FileName { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
 
-        public string? ContentType { get; set; }
-
-        public long? FileSizeBytes { get; set; }
-
-        public byte[] Data { get; set; } = [];
-
-        public DateTime? CreateDate { get; set; }
+        public IFormFile File { get; set; } = null!;
 
     }
 }

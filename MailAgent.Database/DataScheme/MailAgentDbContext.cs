@@ -23,6 +23,8 @@ namespace MailAgent.DataBaseAccess.Contex
 
         public DbSet<EmailMessageAttachment> EmailMessageAttachments => Set<EmailMessageAttachment>();
 
+        public DbSet<EmailMessageCopy> EmailMessageCopies => Set<EmailMessageCopy>();
+
 
         #endregion
 
@@ -49,6 +51,8 @@ namespace MailAgent.DataBaseAccess.Contex
             ConfigureEmailMessageTo(modelBuilder);
 
             ConfigureEmailMessageAttachments(modelBuilder);
+
+            ConfigureEmailMessageCopy(modelBuilder);
         }
 
         #region Private Configuration Methods
@@ -102,6 +106,21 @@ namespace MailAgent.DataBaseAccess.Contex
 
             // Relație circulară
             modelBuilder.Entity<EmailMessageAttachment>().HasOne(a => a.EmailMessage).WithMany(m => m.Attachments).HasForeignKey(a => a.EmailMessageId).OnDelete(DeleteBehavior.Cascade);
+
+        }
+
+        private static void ConfigureEmailMessageCopy(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<EmailMessageCopy>().ToTable("email_message_copy", "dbo");
+
+            modelBuilder.Entity<EmailMessageCopy>().HasKey(c => c.Id);
+            modelBuilder.Entity<EmailMessageCopy>().Property(c => c.Id).HasColumnName("Id").ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<EmailMessageCopy>().Property(c => c.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired();
+            modelBuilder.Entity<EmailMessageCopy>().Property(c => c.Copy).HasColumnName("copy").HasColumnType("nvarchar(100)").IsRequired(false).HasMaxLength(100);
+
+            // Relație circulară 
+            modelBuilder.Entity<EmailMessageCopy>().HasOne(c => c.EmailMessage).WithMany(m => m.Copies).HasForeignKey(c => c.EmailMessageId).OnDelete(DeleteBehavior.Cascade);
 
         }
 
