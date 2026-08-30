@@ -97,11 +97,11 @@ namespace MailAgent.DataBaseAccess.Contex
             modelBuilder.Entity<EmailMessageAttachment>().HasKey(a => a.Id);
             modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.Id).HasColumnName("Id").ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired();
+            modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired(false);
             modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.FileName).HasColumnName("file_name").HasColumnType("nvarchar(255)").IsRequired().HasMaxLength(255);
             modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.ContentType).HasColumnName("content_type").HasColumnType("nvarchar(100)").IsRequired(false).HasMaxLength(100);
             modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.FileSizeBytes).HasColumnName("file_size_bytes").HasColumnType("bigint").IsRequired(false);
-            modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.Data).HasColumnName("data").HasColumnType("varbinary(max)").IsRequired();
+            modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.Data).HasColumnName("data").HasColumnType("varbinary(max)").IsRequired(false);
             modelBuilder.Entity<EmailMessageAttachment>().Property(a => a.CreateDate).HasColumnName("create_date").HasColumnType("datetime2(7)").IsRequired(false);
 
             // Relație circulară
@@ -116,7 +116,7 @@ namespace MailAgent.DataBaseAccess.Contex
             modelBuilder.Entity<EmailMessageCopy>().HasKey(c => c.Id);
             modelBuilder.Entity<EmailMessageCopy>().Property(c => c.Id).HasColumnName("Id").ValueGeneratedOnAdd();
 
-            modelBuilder.Entity<EmailMessageCopy>().Property(c => c.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired();
+            modelBuilder.Entity<EmailMessageCopy>().Property(c => c.EmailMessageId).HasColumnName("email_message_id").HasColumnType("uniqueidentifier").IsRequired(false);
             modelBuilder.Entity<EmailMessageCopy>().Property(c => c.Copy).HasColumnName("copy").HasColumnType("nvarchar(100)").IsRequired(false).HasMaxLength(100);
 
             // Relație circulară 

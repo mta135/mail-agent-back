@@ -42,8 +42,6 @@ namespace MailAgent.Application.Service
                     CreatedAt = DateTime.UtcNow,
                     Status = (int)EmailSendStatusEnum.Pending,
 
-                    /*
-
                     EmailMessageTos = email.To?.ConvertAll(to => new EmailMessageTo
                     {
                         To = to.ToString(),
@@ -56,10 +54,10 @@ namespace MailAgent.Application.Service
                         EmailMessageId = emailId
                     }) ?? [],
 
-                    */
+
 
                 };
-                /*
+            
 
                 if (email.Attachments.Count > 0)
                 {
@@ -70,8 +68,7 @@ namespace MailAgent.Application.Service
                     }
                 }
 
-                */
-
+             
                 await _emailRepository.SaveInitialMessageAsync(emailMessage);
             }
             catch (Exception)

@@ -8,7 +8,7 @@ namespace MailAgent.DataBaseAccess.DataScheme
     {
         public long Id { get; set; }
 
-        public Guid EmailMessageId { get; set; }
+        public Guid? EmailMessageId { get; set; }
 
         public string To { get; set; } = string.Empty;
 
