@@ -1,4 +1,8 @@
 using MailAgent.Application.SendEmailWorker;
+using MailAgent.Application.Service;
+using MailAgent.Application.Service.Abstract;
+using MailAgent.DataBaseAccess.Repositories.Abstract;
+using MailAgent.DataBaseAccess.Repositories.Real;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddSingleton<IEmailChannel, EmailChannel>();
 builder.Services.AddHostedService<EmailBackgroundWorker>();
-
+builder.Services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
+builder.Services.AddScoped<IEmailMessageService, EmailMessageService>();
 
 
 builder.Services.AddControllers();

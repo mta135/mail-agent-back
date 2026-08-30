@@ -10,9 +10,12 @@ namespace MailAgent.DataBaseAccess.Contex
     public class MailAgentDbContext : DbContext
     {
 
-        public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
+        public MailAgentDbContext()
+        {
+            
+        }
 
-        // private static string connectionString = "Data Source=DESKTOP-LHKOQQT;Initial Catalog=MailSender;Integrated Security=True;"; // de acasa
+        public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
 
 
         public MailAgentDbContext(DbContextOptions<MailAgentDbContext> options) : base(options)
@@ -24,7 +27,7 @@ namespace MailAgent.DataBaseAccess.Contex
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Data Source=DESKTOP-F0JTSF2;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=True;Application Name=\"SQL Server Management Studio\";Command Timeout=0;");
+                optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=MailAgent;Integrated Security=True;Trust Server Certificate=True;");
             }
         }
 
