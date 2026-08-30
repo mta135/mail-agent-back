@@ -1,4 +1,4 @@
-﻿using MailAgent.Database.DataBaseModel;
+﻿using MailAgent.DataBaseAccess.DataScheme;
 using System;
 using System.Collections.Generic;
 using System.Text;

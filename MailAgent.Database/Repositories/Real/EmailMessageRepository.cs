@@ -1,5 +1,5 @@
-﻿using MailAgent.Database.DataBaseModel;
-using MailAgent.DataBaseAccess.Contex;
+﻿using MailAgent.DataBaseAccess.Contex;
+using MailAgent.DataBaseAccess.DataScheme;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,6 @@ namespace MailAgent.DataBaseAccess.Repositories.Real
         {
             try
             {
-
                 await _db.EmailMessages.AddAsync(emailMessage);
                 await _db.SaveChangesAsync();
             }

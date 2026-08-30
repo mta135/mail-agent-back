@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MailAgent.Database.DataBaseModel
+namespace MailAgent.DataBaseAccess.DataScheme
 {
     public class EmailMessage
     {

@@ -1,5 +1,5 @@
 ﻿using MailAgent.Application.Service.Abstract;
-using MailAgent.Database.DataBaseModel;
+using MailAgent.DataBaseAccess.DataScheme;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.Model.EmailMessage;
 using System;

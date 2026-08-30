@@ -1,4 +1,4 @@
-﻿using MailAgent.Database.DataBaseModel;
+﻿using MailAgent.DataBaseAccess.DataScheme;
 using MailAgent.Model.EmailMessage;
 using Microsoft.EntityFrameworkCore;
 using System;
