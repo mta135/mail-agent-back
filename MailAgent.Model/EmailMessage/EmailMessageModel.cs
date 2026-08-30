@@ -8,10 +8,16 @@ namespace MailAgent.Model.EmailMessage
     {
         public string From { get; set; } = string.Empty;
 
-        //public List<string> To { get; set; } = [];
+        public string Header { get; set; } = string.Empty;
 
         public string Subject { get; set; } = string.Empty;
 
-        //public string Body { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+
+        public string Footer { get; set; } = string.Empty;
+
+        public List<EmailMessageToModel> EmailMessageTo { get; set; } = [];
+
+        public List<EmailMessageAttachmentModel> Attachments { get; set; } = [];
     }
 }
