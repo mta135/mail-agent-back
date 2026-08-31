@@ -16,16 +16,17 @@ namespace MailAgent.Application.SendEmailWorker
     public class EmailBackgroundWorker : BackgroundService
     {
         private readonly IEmailChannel _emailChannel;
-        private IEmailMessageRepository _emailMessageRepository;
+        private readonly IEmailMessageRepository _emailMessageRepository;
 
         private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly SemaphoreSlim _semaphore;
         private readonly List<Task> _runningTasks = new();
 
-        public EmailBackgroundWorker(IEmailChannel emailChannel, IServiceScopeFactory scopeFactory)
+        public EmailBackgroundWorker(IEmailChannel emailChannel, IServiceScopeFactory scopeFactory, IEmailMessageRepository emailMessageRepository)
         {
             _emailChannel = emailChannel;
+            _emailMessageRepository = emailMessageRepository;
 
             _scopeFactory = scopeFactory;
             _semaphore = new SemaphoreSlim(initialCount: 5, maxCount: 5);
@@ -36,7 +37,7 @@ namespace MailAgent.Application.SendEmailWorker
         {
             try
             {
-                await foreach (var emailId in /*_emailChannel.Reader.ReadAllAsync(stoppingToken)*/  _emailChannel.ReadAllAsync(stoppingToken))
+                await foreach (var emailId in _emailChannel.ReadAllAsync(stoppingToken))
                 {
                     try
                     {
@@ -62,16 +63,13 @@ namespace MailAgent.Application.SendEmailWorker
             }
         }
 
-
         private async Task ProcessMessageAsync(Guid messageId, CancellationToken stoppingToken)
         {
             try
             {
                 //await emailSender.SendAsync(message, stoppingToken);
 
-
-                IEmailMessageRepository repository = GetEmailMessageRepository();
-                await repository.SetEmailStatusAsync(messageId, (int)EmailSendStatusEnum.Sent);
+                await SetEmailSendStatus(messageId, EmailSendStatusEnum.Sent);
             }
             catch (Exception ex)
             {
@@ -79,9 +77,7 @@ namespace MailAgent.Application.SendEmailWorker
 
                 try
                 {
-                    //using var scope = _scopeFactory.CreateScope();
-                    //var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    //await UpdateStatusAsync(dbContext, message.Id, EmailStatus.Failed, ex.Message, stoppingToken);
+                    await SetEmailSendStatus(messageId, EmailSendStatusEnum.Failed);
                 }
                 catch (Exception updateEx)
                 {
@@ -94,11 +90,17 @@ namespace MailAgent.Application.SendEmailWorker
             }
         }
 
+        private async Task SetEmailSendStatus(Guid emailId, EmailSendStatusEnum status)
+        {
+            IEmailMessageRepository repository = GetEmailMessageRepository();
+            await repository.SetEmailStatusAsync(emailId, (int)status);
+        }
 
         private IEmailMessageRepository GetEmailMessageRepository()
         {
             using var scope = _scopeFactory.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
         }
+
     }
 }

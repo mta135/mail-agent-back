@@ -10,10 +10,10 @@ namespace MailAgent.DataBaseAccess.Contex
     public class MailAgentDbContext : DbContext
     {
 
-        public MailAgentDbContext()
-        {
+        //public MailAgentDbContext()
+        //{
             
-        }
+        //}
 
         #region DbSet Properties
 
@@ -34,13 +34,13 @@ namespace MailAgent.DataBaseAccess.Contex
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=MailAgent;Integrated Security=True;Trust Server Certificate=True;");
-            }
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=MailAgent;Integrated Security=True;Trust Server Certificate=True;");
+        //    }
+        //}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

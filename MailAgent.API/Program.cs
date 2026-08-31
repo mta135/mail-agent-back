@@ -1,8 +1,10 @@
 using MailAgent.Application.SendEmailWorker;
 using MailAgent.Application.Service;
 using MailAgent.Application.Service.Abstract;
+using MailAgent.DataBaseAccess.Contex;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Real;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 
@@ -13,6 +15,10 @@ builder.Services.AddSingleton<IEmailChannel, EmailChannel>();
 builder.Services.AddHostedService<EmailBackgroundWorker>();
 builder.Services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
 builder.Services.AddScoped<IEmailMessageService, EmailMessageService>();
+
+
+builder.Services.AddDbContext<MailAgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MailAgent")));
+
 
 
 builder.Services.AddControllers();

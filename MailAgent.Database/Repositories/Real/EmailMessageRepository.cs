@@ -12,9 +12,9 @@ namespace MailAgent.DataBaseAccess.Repositories.Real
     {
         private readonly MailAgentDbContext _db;
 
-        public EmailMessageRepository()
+        public EmailMessageRepository(MailAgentDbContext db)
         {
-            _db = new MailAgentDbContext();
+            _db = db;
         }
 
         public async Task SaveInitialMessageAsync(EmailMessage emailMessage)
