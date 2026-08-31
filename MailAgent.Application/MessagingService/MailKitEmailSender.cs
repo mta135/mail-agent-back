@@ -1,10 +1,9 @@
 ﻿using MailAgent.Model.EmailMessage;
-using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Options;
 using MimeKit;
+
 using System.Text;
 
 namespace MailAgent.Application.MessagingService
@@ -18,48 +17,15 @@ namespace MailAgent.Application.MessagingService
             _settings = options.Value;
         }
 
-        public async Task SendEmailAsync(EmaiMessagelRequestModel request, CancellationToken cancellationToken = default)
+        public async Task<Tuple<bool, string>> SendEmailAsync(EmaiMessagelRequestModel request, CancellationToken cancellationToken = default)
         {
+            MimeMessage message = SetMimeMessage(request);
 
-            try
-            {
-                MimeMessage message = new();
-
-                message.From.Add(new MailboxAddress(_settings.SenderName, _settings.SmtpUser));
-
-                AddToRecipients(message, request.To.Select(x => x.EmailTo).ToList());
-
-                AddCcRecipients(message, request.Copy.Select(x => x.EmailCopy ?? string.Empty).ToList());
-
-                message.Subject = request.Subject;
-
-                BodyBuilder bodyBuilder = new()
-                {
-                    HtmlBody = CreateHtmlContent(request)
-                };
-                
-                AddAttachments(bodyBuilder, request.Attachments);
-
-                message.Body = bodyBuilder.ToMessageBody();
-
-                using SmtpClient client = new SmtpClient();
-
-                await client.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, _settings.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None, cancellationToken);
-
-                await client.AuthenticateAsync(_settings.SmtpUser, _settings.SmtpPassword, cancellationToken);
-
-                await client.SendAsync(message, cancellationToken);
-
-                await client.DisconnectAsync(true, cancellationToken);
-
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it as needed
-                throw new InvalidOperationException("Failed to send email.", ex);
-            }
+            using SmtpClient smtpClient = await CreateSmtpClient(cancellationToken);
+            return await SendAndDisconnectEmailMessageAsync(smtpClient, message, cancellationToken);
 
         }
+
 
         private void AddToRecipients(MimeMessage message, List<string> recipients)
         {
@@ -77,7 +43,6 @@ namespace MailAgent.Application.MessagingService
             }
         }
 
-
         private void AddAttachments(BodyBuilder bodyBuilder, List<EmailMessageRequestAttachmentModel> attachments)
         {
             foreach (var attachment in attachments)
@@ -94,9 +59,65 @@ namespace MailAgent.Application.MessagingService
 
             htmlBuilder.Append(request.Body);
             htmlBuilder.Append(request.Footer);
-            
+
             htmlBuilder.Append("</body></html>");
             return htmlBuilder.ToString();
         }
+
+        private MimeMessage SetMimeMessage(EmaiMessagelRequestModel request)
+        {
+            MimeMessage message = new MimeMessage();
+
+            message.From.Add(new MailboxAddress(_settings.SenderName, _settings.SmtpUser));
+
+            List<string> toRecipients = request.To.Select(x => x.EmailTo).ToList();
+            AddToRecipients(message, toRecipients);
+
+            List<string> ccRecipients = request.Copy.Select(x => x.EmailCopy ?? string.Empty).ToList();
+            AddCcRecipients(message, ccRecipients);
+
+            message.Subject = request.Subject;
+            
+            message.Body = CreateBodyBuilder(request).ToMessageBody();
+            return message;
+        }
+
+        BodyBuilder CreateBodyBuilder(EmaiMessagelRequestModel request)
+        {
+            BodyBuilder bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = CreateHtmlContent(request)
+            };
+
+            AddAttachments(bodyBuilder, request.Attachments);
+            return bodyBuilder;
+        }
+
+        private async Task<SmtpClient> CreateSmtpClient(CancellationToken cancellationToken)
+        {
+            SmtpClient client = new SmtpClient();
+
+            await client.ConnectAsync(_settings.SmtpHost, _settings.SmtpPort, _settings.UseSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None, cancellationToken);
+
+            await client.AuthenticateAsync(_settings.SmtpUser, _settings.SmtpPassword, cancellationToken);
+
+            return client;
+        }
+
+        private async Task<Tuple<bool, string>> SendAndDisconnectEmailMessageAsync(SmtpClient smtpClient, MimeMessage mailMessage, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var value = await smtpClient.SendAsync(mailMessage);
+                await smtpClient.DisconnectAsync(true, cancellationToken);
+
+                return new Tuple<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<bool, string>(false, ex.ToString());
+            }
+        }
+
     }
 }

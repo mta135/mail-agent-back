@@ -80,13 +80,13 @@ namespace MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker
 
                 await emailSender.SendEmailAsync(requestModel, stoppingToken);
 
-                await repository.SetEmailStatusAsync(dbRequestModel, (int)EmailSendStatusEnum.Sent);
+                await repository.SetEmailMessageSendStatusAsync(dbRequestModel, (int)EmailSendStatusEnum.Sent);
             }
 
             catch (Exception ex)
             {
                 string _log = ex.ToString();
-                await repository.SetEmailStatusAsync(dbRequestModel!, (int)EmailSendStatusEnum.Failed);
+                await repository.SetEmailMessageSendStatusAsync(dbRequestModel!, (int)EmailSendStatusEnum.Failed);
             }
             finally
             {

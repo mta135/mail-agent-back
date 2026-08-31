@@ -9,7 +9,7 @@ namespace MailAgent.DataBaseAccess.Repositories.Abstract
     {
         Task SaveInitialMessageAsync(EmailMessage emailMessage);
 
-        Task SetEmailStatusAsync(EmailMessage emailMessage, int status);
+        Task SetEmailMessageSendStatusAsync(EmailMessage emailMessage, int status);
 
         Task<EmailMessage?> GetEmailMessageByIdAsync(Guid emailId);
     }

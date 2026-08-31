@@ -31,7 +31,7 @@ namespace MailAgent.DataBaseAccess.Repositories.Real
 
         }
 
-        public async Task SetEmailStatusAsync(EmailMessage emailMessage, int status)
+        public async Task SetEmailMessageSendStatusAsync(EmailMessage emailMessage, int status)
         {
             try
             {

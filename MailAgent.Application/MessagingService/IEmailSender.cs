@@ -7,6 +7,6 @@ namespace MailAgent.Application.MessagingService
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(EmaiMessagelRequestModel message, CancellationToken cancellationToken = default);
+        Task<Tuple<bool, string>> SendEmailAsync(EmaiMessagelRequestModel message, CancellationToken cancellationToken = default);
     }
 }
