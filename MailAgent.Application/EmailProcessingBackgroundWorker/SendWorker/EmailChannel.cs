@@ -5,7 +5,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Channels;
 
-namespace MailAgent.Application.SendEmailWorker
+namespace MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker
 {
     public class EmailChannel : IEmailChannel
     {

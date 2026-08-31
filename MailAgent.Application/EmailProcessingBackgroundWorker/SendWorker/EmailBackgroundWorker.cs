@@ -15,7 +15,7 @@ using System.Net.Mail;
 using System.Net.NetworkInformation;
 using System.Text;
 
-namespace MailAgent.Application.SendEmailWorker
+namespace MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker
 {
     public class EmailBackgroundWorker : BackgroundService
     {

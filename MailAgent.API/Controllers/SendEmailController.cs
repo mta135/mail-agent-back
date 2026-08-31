@@ -1,4 +1,4 @@
-﻿using MailAgent.Application.SendEmailWorker;
+﻿using MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker;
 using MailAgent.Application.Service;
 using MailAgent.Application.Service.Abstract;
 using MailAgent.Model.EmailMessage;

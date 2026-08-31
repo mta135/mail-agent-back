@@ -1,5 +1,5 @@
+using MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker;
 using MailAgent.Application.MessagingService;
-using MailAgent.Application.SendEmailWorker;
 using MailAgent.Application.Service;
 using MailAgent.Application.Service.Abstract;
 using MailAgent.DataBaseAccess.Contex;
