@@ -26,7 +26,6 @@ namespace MailAgent.Application.MessagingService
 
         }
 
-
         private void AddToRecipients(MimeMessage message, List<string> recipients)
         {
             foreach (var recipient in recipients)
