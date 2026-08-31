@@ -18,7 +18,7 @@ namespace MailAgent.Application.MessagingService
             _settings = options.Value;
         }
 
-        public async Task SendAsync(EmaiMessagelRequestModel request, CancellationToken cancellationToken = default)
+        public async Task SendEmailAsync(EmaiMessagelRequestModel request, CancellationToken cancellationToken = default)
         {
 
             try

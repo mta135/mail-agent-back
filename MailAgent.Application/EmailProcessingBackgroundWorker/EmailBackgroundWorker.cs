@@ -21,7 +21,6 @@ namespace MailAgent.Application.SendEmailWorker
     {
         private readonly IEmailChannel _emailChannel;
 
-
         private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly SemaphoreSlim _semaphore;
@@ -35,7 +34,6 @@ namespace MailAgent.Application.SendEmailWorker
             _scopeFactory = scopeFactory;
             _semaphore = new SemaphoreSlim(initialCount: 5, maxCount: 5);
         }
-
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -80,16 +78,15 @@ namespace MailAgent.Application.SendEmailWorker
             {
                 (requestModel, dbRequestModel) = await GetDbEmailMessage(messageId, repository);
 
-                await emailSender.SendAsync(requestModel, stoppingToken);
+                await emailSender.SendEmailAsync(requestModel, stoppingToken);
 
                 await repository.SetEmailStatusAsync(dbRequestModel, (int)EmailSendStatusEnum.Sent);
             }
 
-
             catch (Exception ex)
             {
                 string _log = ex.ToString();
-                await SetEmailSendStatus(dbRequestModel!, EmailSendStatusEnum.Failed, repository);
+                await repository.SetEmailStatusAsync(dbRequestModel!, (int)EmailSendStatusEnum.Failed);
             }
             finally
             {
@@ -97,14 +94,8 @@ namespace MailAgent.Application.SendEmailWorker
             }
         }
 
-        private async Task SetEmailSendStatus(EmailMessage emailMessage, EmailSendStatusEnum status, IEmailMessageRepository repository)
-        {
-            await repository.SetEmailStatusAsync(emailMessage, (int)status);
-        }
-
         private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetDbEmailMessage(Guid emailId, IEmailMessageRepository repository)
         {
-
             EmailMessage? dbModel = await repository.GetEmailMessageByIdAsync(emailId) ?? throw new InvalidOperationException("Email message not found");
 
             EmaiMessagelRequestModel request = new EmaiMessagelRequestModel
@@ -130,15 +121,7 @@ namespace MailAgent.Application.SendEmailWorker
                 }).ToList()
             };
 
-
-
             return new Tuple<EmaiMessagelRequestModel, EmailMessage>(request, dbModel);
         }
-
-        private async Task SendEmailAsync(EmaiMessagelRequestModel email, CancellationToken cancellationToken, IEmailSender emailSender)
-        {
-            await emailSender.SendAsync(email, cancellationToken);
-        }
-
     }
 }
