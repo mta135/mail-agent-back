@@ -29,7 +29,7 @@ namespace MailAgent.Application.MessagingService
 
                 AddToRecipients(message, request.To.Select(x => x.EmailTo).ToList());
 
-                if (request.Copy.Any()) AddCcRecipients(message, request.Copy.Select(x => x.EmailCopy ?? string.Empty).ToList());
+                AddCcRecipients(message, request.Copy.Select(x => x.EmailCopy ?? string.Empty).ToList());
 
                 message.Subject = request.Subject;
 
@@ -37,8 +37,8 @@ namespace MailAgent.Application.MessagingService
                 {
                     HtmlBody = CreateHtmlContent(request)
                 };
-
-                if (request.Attachments.Any()) AddAttachments(bodyBuilder, request.Attachments);
+                
+                AddAttachments(bodyBuilder, request.Attachments);
 
                 message.Body = bodyBuilder.ToMessageBody();
 
@@ -51,7 +51,6 @@ namespace MailAgent.Application.MessagingService
                 await client.SendAsync(message, cancellationToken);
 
                 await client.DisconnectAsync(true, cancellationToken);
-
 
             }
             catch (Exception ex)
