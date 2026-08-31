@@ -22,6 +22,9 @@ builder.Services.AddScoped<IEmailSender, MailKitEmailSender>();
 
 builder.Services.AddDbContext<MailAgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MailAgent")));
 
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
