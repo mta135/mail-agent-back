@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
+using System.Net.NetworkInformation;
 using System.Text;
 
 namespace MailAgent.Application.SendEmailWorker
@@ -67,7 +68,7 @@ namespace MailAgent.Application.SendEmailWorker
 
         private async Task ProcessMessageAsync(Guid messageId, CancellationToken stoppingToken)
         {
-            EmailMessage? dbModel = null;
+            EmailMessage? dbRequestModel = null;
             EmaiMessagelRequestModel? requestModel = null;
 
             using var scope = _scopeFactory.CreateScope();
@@ -77,22 +78,18 @@ namespace MailAgent.Application.SendEmailWorker
 
             try
             {
-                (requestModel, dbModel) = await GetEmailMessage(messageId, repository);
+                (requestModel, dbRequestModel) = await GetDbEmailMessage(messageId, repository);
 
-                await SendEmailAsync(requestModel, stoppingToken, emailSender);
+                await emailSender.SendAsync(requestModel, stoppingToken);
 
-                await SetEmailSendStatus(dbModel, EmailSendStatusEnum.Sent, repository);
+                await repository.SetEmailStatusAsync(dbRequestModel, (int)EmailSendStatusEnum.Sent);
             }
+
+
             catch (Exception ex)
             {
-                try
-                {
-                    await SetEmailSendStatus(dbModel!, EmailSendStatusEnum.Failed, repository);
-                }
-                catch (Exception updateEx)
-                {
-                    string log = updateEx.ToString();
-                }
+                string _log = ex.ToString();
+                await SetEmailSendStatus(dbRequestModel!, EmailSendStatusEnum.Failed, repository);
             }
             finally
             {
@@ -105,7 +102,7 @@ namespace MailAgent.Application.SendEmailWorker
             await repository.SetEmailStatusAsync(emailMessage, (int)status);
         }
 
-        private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetEmailMessage(Guid emailId, IEmailMessageRepository repository)
+        private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetDbEmailMessage(Guid emailId, IEmailMessageRepository repository)
         {
 
             EmailMessage? dbModel = await repository.GetEmailMessageByIdAsync(emailId) ?? throw new InvalidOperationException("Email message not found");
