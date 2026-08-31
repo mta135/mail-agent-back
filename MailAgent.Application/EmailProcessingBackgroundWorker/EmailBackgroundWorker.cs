@@ -19,17 +19,17 @@ namespace MailAgent.Application.SendEmailWorker
     public class EmailBackgroundWorker : BackgroundService
     {
         private readonly IEmailChannel _emailChannel;
-        private readonly IEmailMessageRepository _emailMessageRepository;
+
 
         private readonly IServiceScopeFactory _scopeFactory;
 
         private readonly SemaphoreSlim _semaphore;
         private readonly List<Task> _runningTasks = new();
 
-        public EmailBackgroundWorker(IEmailChannel emailChannel, IServiceScopeFactory scopeFactory, IEmailMessageRepository emailMessageRepository)
+        public EmailBackgroundWorker(IEmailChannel emailChannel, IServiceScopeFactory scopeFactory)
         {
             _emailChannel = emailChannel;
-            _emailMessageRepository = emailMessageRepository;
+
 
             _scopeFactory = scopeFactory;
             _semaphore = new SemaphoreSlim(initialCount: 5, maxCount: 5);
