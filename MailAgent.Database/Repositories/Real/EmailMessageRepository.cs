@@ -47,5 +47,19 @@ namespace MailAgent.DataBaseAccess.Repositories.Real
                 throw;
             }
         }
+
+        public async Task<EmailMessage?> GetEmailMessageByIdAsync(Guid emailId)
+        {
+            try
+            {
+                return await _db.EmailMessages.Include(em => em.EmailMessageTos)
+                    .Include(em => em.Copies).Include(em => em.Attachments).FirstOrDefaultAsync(em => em.Id == emailId);
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

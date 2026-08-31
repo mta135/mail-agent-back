@@ -1,7 +1,9 @@
-﻿using MailAgent.DataBaseAccess.Repositories.Abstract;
+﻿using MailAgent.DataBaseAccess.DataScheme;
+using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Real;
 using MailAgent.Model.EmailMessage;
 using MailAgent.Model.Enums;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -67,6 +69,8 @@ namespace MailAgent.Application.SendEmailWorker
         {
             try
             {
+                (EmailMessageModel model, EmailMessage dbModel) = await GetEmailMessage(messageId);
+
                 //await emailSender.SendAsync(message, stoppingToken);
 
                 await SetEmailSendStatus(messageId, EmailSendStatusEnum.Sent);
@@ -100,6 +104,40 @@ namespace MailAgent.Application.SendEmailWorker
         {
             using var scope = _scopeFactory.CreateScope();
             return scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
+        }
+
+
+        private async Task<Tuple<EmailMessageModel, EmailMessage>> GetEmailMessage(Guid emailId)
+        {
+            IEmailMessageRepository repository = GetEmailMessageRepository();
+
+            EmailMessage? dbModel = await repository.GetEmailMessageByIdAsync(emailId) ?? throw new InvalidOperationException("Email message not found");
+
+
+            EmailMessageModel model = new EmailMessageModel();
+
+
+            model.From = dbModel.From;
+            model.Header = dbModel.Header;
+
+            model.Subject = dbModel.Subject;
+            model.Body = dbModel.Body;
+
+            model.Footer = dbModel.Footer;
+
+            model.To = dbModel.EmailMessageTos.Select(x => x.To).ToList();
+
+            model.Copy = dbModel.Copies.Select(x => x.Copy ?? string.Empty).ToList();
+
+            //model.Attachments = dbModel.Attachments.Select(a => new Attachment
+            //{
+            //    FileName = a.FileName,
+            //    ContentType = a.ContentType,
+            //    Content = a.Content // byte[]
+            //}).ToList();
+
+
+            return new Tuple<EmailMessageModel, EmailMessage>(model, dbModel);
         }
 
     }
