@@ -69,7 +69,7 @@ namespace MailAgent.Application.SendEmailWorker
         {
             try
             {
-                (EmailMessageModel model, EmailMessage dbModel) = await GetEmailMessage(messageId);
+                (EmaiMessagelRequestModel model, EmailMessage dbModel) = await GetEmailMessage(messageId);
 
                 //await emailSender.SendAsync(message, stoppingToken);
 
@@ -106,38 +106,38 @@ namespace MailAgent.Application.SendEmailWorker
             return scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
         }
 
-
-        private async Task<Tuple<EmailMessageModel, EmailMessage>> GetEmailMessage(Guid emailId)
+        private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetEmailMessage(Guid emailId)
         {
             IEmailMessageRepository repository = GetEmailMessageRepository();
 
             EmailMessage? dbModel = await repository.GetEmailMessageByIdAsync(emailId) ?? throw new InvalidOperationException("Email message not found");
 
+            EmaiMessagelRequestModel request = new EmaiMessagelRequestModel
+            {
+                From = dbModel.From,
+                Header = dbModel.Header,
 
-            EmailMessageModel model = new EmailMessageModel();
+                Subject = dbModel.Subject,
+                Body = dbModel.Body,
+
+                Footer = dbModel.Footer,
+
+                To = [.. dbModel.EmailMessageTos.Select(x => new EmailMessageRequestToModel { To = x.To })],
+                Copy = [.. dbModel.Copies.Select(x => new EmailMessageRequestCopyModel { Copy = x.Copy ?? string.Empty })],
+
+                Attachments = dbModel.Attachments.Select(a => new EmailMessageRequestAttachmentModel
+                {
+                    FileName = a.FileName,
+                    ContentType = a.ContentType,
+
+                    Data = a.Data 
+
+                }).ToList()
+            };
 
 
-            model.From = dbModel.From;
-            model.Header = dbModel.Header;
 
-            model.Subject = dbModel.Subject;
-            model.Body = dbModel.Body;
-
-            model.Footer = dbModel.Footer;
-
-            model.To = dbModel.EmailMessageTos.Select(x => x.To).ToList();
-
-            model.Copy = dbModel.Copies.Select(x => x.Copy ?? string.Empty).ToList();
-
-            //model.Attachments = dbModel.Attachments.Select(a => new Attachment
-            //{
-            //    FileName = a.FileName,
-            //    ContentType = a.ContentType,
-            //    Content = a.Content // byte[]
-            //}).ToList();
-
-
-            return new Tuple<EmailMessageModel, EmailMessage>(model, dbModel);
+            return new Tuple<EmaiMessagelRequestModel, EmailMessage>(request, dbModel);
         }
 
     }
