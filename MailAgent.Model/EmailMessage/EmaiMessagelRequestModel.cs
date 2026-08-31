@@ -27,7 +27,7 @@ namespace MailAgent.Model.EmailMessage
 
     public class EmailMessageRequestToModel
     {
-        public string To { get; set; } = string.Empty;
+        public string EmailTo { get; set; } = string.Empty;
     }
 
 
@@ -47,13 +47,8 @@ namespace MailAgent.Model.EmailMessage
 
     public class EmailMessageRequestCopyModel
     {
-        public long Id { get; set; }
 
-        public Guid? EmailMessageId { get; set; }
-
-        public string? Copy { get; set; }
-
-        // Navigare circulară către părinte
+        public string? EmailCopy { get; set; }
 
     }
 }

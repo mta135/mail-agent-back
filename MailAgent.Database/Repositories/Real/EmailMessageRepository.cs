@@ -31,16 +31,12 @@ namespace MailAgent.DataBaseAccess.Repositories.Real
 
         }
 
-        public async Task SetEmailStatusAsync(Guid emailId, int status)
+        public async Task SetEmailStatusAsync(EmailMessage emailMessage, int status)
         {
             try
             {
-                EmailMessage? emailMessage = await _db.EmailMessages.FirstOrDefaultAsync(em => em.Id == emailId);
-                if (emailMessage != null)
-                {
-                    emailMessage.Status = status;
-                    await _db.SaveChangesAsync();
-                }
+                emailMessage.Status = status;
+                await _db.SaveChangesAsync();
             }
             catch (Exception ex)
             {

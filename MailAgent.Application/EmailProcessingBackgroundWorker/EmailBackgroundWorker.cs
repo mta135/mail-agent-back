@@ -1,4 +1,5 @@
-﻿using MailAgent.DataBaseAccess.DataScheme;
+﻿using MailAgent.Application.MessagingService;
+using MailAgent.DataBaseAccess.DataScheme;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Real;
 using MailAgent.Model.EmailMessage;
@@ -51,7 +52,6 @@ namespace MailAgent.Application.SendEmailWorker
 
                         _runningTasks.RemoveAll(t => t.IsCompleted);
 
-
                     }
                     catch (Exception ex)
                     {
@@ -67,25 +67,27 @@ namespace MailAgent.Application.SendEmailWorker
 
         private async Task ProcessMessageAsync(Guid messageId, CancellationToken stoppingToken)
         {
+            EmailMessage? dbModel = null;
+
+            EmaiMessagelRequestModel? requestModel = null;
+
             try
             {
-                (EmaiMessagelRequestModel model, EmailMessage dbModel) = await GetEmailMessage(messageId);
+                (requestModel, dbModel) = await GetEmailMessage(messageId);
 
-                //await emailSender.SendAsync(message, stoppingToken);
+                await SendEmailAsync(requestModel, stoppingToken);
 
-                await SetEmailSendStatus(messageId, EmailSendStatusEnum.Sent);
+                await SetEmailSendStatus(dbModel, EmailSendStatusEnum.Sent);
             }
             catch (Exception ex)
             {
-               // _logger.LogError(ex, "Eroare la trimiterea emailului {EmailId}", message.Id);
-
                 try
                 {
-                    await SetEmailSendStatus(messageId, EmailSendStatusEnum.Failed);
+                    await SetEmailSendStatus(dbModel!, EmailSendStatusEnum.Failed);
                 }
                 catch (Exception updateEx)
                 {
-                    //_logger.LogError(updateEx, "Eroare la actualizarea statusului pentru emailul {EmailId}", message.Id);
+                    string log = updateEx.ToString();
                 }
             }
             finally
@@ -94,10 +96,10 @@ namespace MailAgent.Application.SendEmailWorker
             }
         }
 
-        private async Task SetEmailSendStatus(Guid emailId, EmailSendStatusEnum status)
+        private async Task SetEmailSendStatus(EmailMessage emailMessage, EmailSendStatusEnum status)
         {
             IEmailMessageRepository repository = GetEmailMessageRepository();
-            await repository.SetEmailStatusAsync(emailId, (int)status);
+            await repository.SetEmailStatusAsync(emailMessage, (int)status);
         }
 
         private IEmailMessageRepository GetEmailMessageRepository()
@@ -122,8 +124,8 @@ namespace MailAgent.Application.SendEmailWorker
 
                 Footer = dbModel.Footer,
 
-                To = [.. dbModel.EmailMessageTos.Select(x => new EmailMessageRequestToModel { To = x.To })],
-                Copy = [.. dbModel.Copies.Select(x => new EmailMessageRequestCopyModel { Copy = x.Copy ?? string.Empty })],
+                To = [.. dbModel.EmailMessageTos.Select(x => new EmailMessageRequestToModel { EmailTo = x.To })],
+                Copy = [.. dbModel.Copies.Select(x => new EmailMessageRequestCopyModel { EmailCopy = x.Copy ?? string.Empty })],
 
                 Attachments = dbModel.Attachments.Select(a => new EmailMessageRequestAttachmentModel
                 {
@@ -140,5 +142,21 @@ namespace MailAgent.Application.SendEmailWorker
             return new Tuple<EmaiMessagelRequestModel, EmailMessage>(request, dbModel);
         }
 
+
+        //private async Task IEmailSender GetEmailSender()
+        //{
+        //    using var scope = _scopeFactory.CreateScope();
+        //    await scope.ServiceProvider.GetRequiredService<IEmailSender>();
+        //}
+
+
+
+        private async Task SendEmailAsync(EmaiMessagelRequestModel email, CancellationToken cancellationToken)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+
+            await emailSender.SendAsync(email, cancellationToken);
+        }
     }
 }
