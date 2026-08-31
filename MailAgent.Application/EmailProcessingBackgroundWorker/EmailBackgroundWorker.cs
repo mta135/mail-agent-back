@@ -68,22 +68,26 @@ namespace MailAgent.Application.SendEmailWorker
         private async Task ProcessMessageAsync(Guid messageId, CancellationToken stoppingToken)
         {
             EmailMessage? dbModel = null;
-
             EmaiMessagelRequestModel? requestModel = null;
+
+            using var scope = _scopeFactory.CreateScope();
+
+            IEmailMessageRepository repository = scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
+            IEmailSender emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
 
             try
             {
-                (requestModel, dbModel) = await GetEmailMessage(messageId);
+                (requestModel, dbModel) = await GetEmailMessage(messageId, repository);
 
-                await SendEmailAsync(requestModel, stoppingToken);
+                await SendEmailAsync(requestModel, stoppingToken, emailSender);
 
-                await SetEmailSendStatus(dbModel, EmailSendStatusEnum.Sent);
+                await SetEmailSendStatus(dbModel, EmailSendStatusEnum.Sent, repository);
             }
             catch (Exception ex)
             {
                 try
                 {
-                    await SetEmailSendStatus(dbModel!, EmailSendStatusEnum.Failed);
+                    await SetEmailSendStatus(dbModel!, EmailSendStatusEnum.Failed, repository);
                 }
                 catch (Exception updateEx)
                 {
@@ -96,21 +100,13 @@ namespace MailAgent.Application.SendEmailWorker
             }
         }
 
-        private async Task SetEmailSendStatus(EmailMessage emailMessage, EmailSendStatusEnum status)
+        private async Task SetEmailSendStatus(EmailMessage emailMessage, EmailSendStatusEnum status, IEmailMessageRepository repository)
         {
-            IEmailMessageRepository repository = GetEmailMessageRepository();
             await repository.SetEmailStatusAsync(emailMessage, (int)status);
         }
 
-        private IEmailMessageRepository GetEmailMessageRepository()
+        private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetEmailMessage(Guid emailId, IEmailMessageRepository repository)
         {
-            using var scope = _scopeFactory.CreateScope();
-            return scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
-        }
-
-        private async Task<Tuple<EmaiMessagelRequestModel, EmailMessage>> GetEmailMessage(Guid emailId)
-        {
-            IEmailMessageRepository repository = GetEmailMessageRepository();
 
             EmailMessage? dbModel = await repository.GetEmailMessageByIdAsync(emailId) ?? throw new InvalidOperationException("Email message not found");
 
@@ -142,21 +138,10 @@ namespace MailAgent.Application.SendEmailWorker
             return new Tuple<EmaiMessagelRequestModel, EmailMessage>(request, dbModel);
         }
 
-
-        //private async Task IEmailSender GetEmailSender()
-        //{
-        //    using var scope = _scopeFactory.CreateScope();
-        //    await scope.ServiceProvider.GetRequiredService<IEmailSender>();
-        //}
-
-
-
-        private async Task SendEmailAsync(EmaiMessagelRequestModel email, CancellationToken cancellationToken)
+        private async Task SendEmailAsync(EmaiMessagelRequestModel email, CancellationToken cancellationToken, IEmailSender emailSender)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
-
             await emailSender.SendAsync(email, cancellationToken);
         }
+
     }
 }
