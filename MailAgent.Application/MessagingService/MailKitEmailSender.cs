@@ -1,5 +1,8 @@
 ﻿using MailAgent.Model.EmailMessage;
+using MailKit;
+using MailKit.Net.Imap;
 using MailKit.Net.Smtp;
+using MailKit.Search;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
@@ -11,11 +14,15 @@ namespace MailAgent.Application.MessagingService
     public class MailKitEmailSender : IEmailSender
     {
         private readonly EmailSettings _settings;
+        private readonly ImapSettings _imapSettings;
 
-        public MailKitEmailSender(IOptions<EmailSettings> options)
+        public MailKitEmailSender(IOptions<EmailSettings> emailOptions, IOptions<ImapSettings> imapOptions)
         {
-            _settings = options.Value;
+            _settings = emailOptions.Value;
+            _imapSettings = imapOptions.Value;
         }
+
+        #region SendEmailAsync
 
         public async Task<Tuple<bool, string>> SendEmailAsync(EmaiMessagelRequestModel request, CancellationToken cancellationToken = default)
         {
@@ -76,7 +83,7 @@ namespace MailAgent.Application.MessagingService
             AddCcRecipients(message, ccRecipients);
 
             message.Subject = request.Subject;
-            
+
             message.Body = CreateBodyBuilder(request).ToMessageBody();
             return message;
         }
@@ -118,5 +125,71 @@ namespace MailAgent.Application.MessagingService
             }
         }
 
+
+        #endregion
+
+        #region ReceiveEmail
+
+        public async Task ReceiveEmailAsync(CancellationToken cancellationToken = default)
+        {
+            using var client = new ImapClient();
+
+            try
+            {
+                // 1. Connect to the secure IMAP server
+                await client.ConnectAsync(_imapSettings.Host, _imapSettings.Port, useSsl: _imapSettings.UseSsl, cancellationToken: cancellationToken);
+
+                // 2. Authenticate using credentials
+                await client.AuthenticateAsync(_imapSettings.Username, _imapSettings.Password);
+
+                // 3. Open the target mailbox folder (ReadWrite allows altering read/unread flags)
+                var inbox = client.Inbox;
+                await inbox.OpenAsync(FolderAccess.ReadWrite);
+
+                Console.WriteLine($"Total messages: {inbox.Count}");
+                Console.WriteLine($"Recent messages: {inbox.Recent}");
+
+                // 4. Search for specific messages (e.g., all unread emails)
+                var query = SearchQuery.NotSeen;
+                var uniqueIds = await inbox.SearchAsync(query);
+
+                foreach (var uid in uniqueIds)
+                {
+                    MimeMessage message = await inbox.GetMessageAsync(uid);
+
+                    // Access email fields safely
+                    Console.WriteLine($"-------------------------------------------------");
+                    Console.WriteLine($"Subject: {message.Subject}");
+                    Console.WriteLine($"From:    {message.From}");
+                    Console.WriteLine($"Date:    {message.Date}");
+                    Console.WriteLine($"Date:    {message.To}");
+                    Console.WriteLine($"Date:    {message.Cc}");
+                    Console.WriteLine($"Date:    {message.Attachments}");
+
+                    Console.WriteLine($"Body:    {message.TextBody}");
+                    Console.WriteLine($"Body:    {message.HtmlBody}"); 
+
+
+                    //await inbox.AddFlagsAsync(uid, MessageFlags.Seen, silent: true);
+                }
+
+                // 6. Disconnect cleanly from the server
+                await client.DisconnectAsync(quit: true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+
+        #endregion
+
+
     }
+
 }
+
+
+
+
+

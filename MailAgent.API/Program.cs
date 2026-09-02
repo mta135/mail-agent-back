@@ -1,3 +1,4 @@
+using MailAgent.Application.EmailProcesBackgroundWorker.ReceiveWorker;
 using MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker;
 using MailAgent.Application.MessagingService;
 using MailAgent.Application.Service;
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddSingleton<IEmailChannel, EmailChannel>();
 builder.Services.AddHostedService<EmailBackgroundWorker>();
+builder.Services.AddHostedService<ReceiveEmailBackgroundWorker>();
 builder.Services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
 
 builder.Services.AddScoped<IEmailMessageService, EmailMessageService>();
@@ -23,7 +25,7 @@ builder.Services.AddScoped<IEmailSender, MailKitEmailSender>();
 builder.Services.AddDbContext<MailAgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MailAgent")));
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
-
+builder.Services.Configure<ImapSettings>(builder.Configuration.GetSection("ImapSettings"));
 
 
 builder.Services.AddControllers();
