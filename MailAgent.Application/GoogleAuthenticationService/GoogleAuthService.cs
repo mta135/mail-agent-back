@@ -66,6 +66,7 @@ namespace MailAgent.API.Services
         {
             HttpClient? client = _httpClientFactory.CreateClient();
             using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/oauth2/v2/userinfo");
+
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
             HttpResponseMessage response = await client.SendAsync(request);
