@@ -77,9 +77,6 @@ namespace MailAgent.API.Services
             return doc.RootElement.GetProperty("email").GetString() ?? throw new InvalidOperationException("Emailul nu a putut fi extras din profilul Google.");
         }
     }
-
-
-
 }
 
 
