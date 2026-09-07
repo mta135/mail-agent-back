@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MailAgent.Application\MailAgent.Application.csproj" />
-    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

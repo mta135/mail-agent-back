@@ -3,5 +3,4 @@
   <Project Path="MailAgent.Application/MailAgent.Application.csproj" />
   <Project Path="MailAgent.Database/MailAgent.DataBaseAccess.csproj" />
   <Project Path="MailAgent.Model/MailAgent.Model.csproj" />
-  <Project Path="Shared/Shared.csproj" Id="24e6d1ed-d4a0-423c-81b6-d5d192d7e3f9" />
 </Solution>

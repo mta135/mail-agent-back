@@ -1,6 +1,7 @@
 ﻿using MailAgent.API.Services;
 using MailAgent.Application.EmailProcesBackgroundWorker.ReceiveWorker;
 using MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker;
+using MailAgent.Application.GoogleAuthenticationService;
 using MailAgent.Application.MessagingService;
 using MailAgent.Application.Service;
 using MailAgent.Application.Service.Abstract;
@@ -27,8 +28,6 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 builder.Services.Configure<GoogleOAuthOptions>(builder.Configuration.GetSection(GoogleOAuthOptions.SectionName));
 builder.Services.AddHttpClient();
-
-
 
 builder.Services.AddDbContext<MailAgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MailAgent")));
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MailAgent.Application.GoogleAuthenticationService;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MailAgent.API.Controllers
@@ -32,53 +33,53 @@ namespace MailAgent.API.Controllers
         /// Google trimite aici codul temporar prin query params.
         /// </summary>
         [HttpGet("callback")]
-        public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state, CancellationToken ct)
+        public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state)
         {
             if (string.IsNullOrEmpty(code))
             {
                 return BadRequest("Codul de autorizare lipsește din răspunsul Google.");
             }
 
-          
-                try
+
+            try
+            {
+                // 1. Schimbă codul pe tokens
+                var tokens = await _googleAuthService.ExchangeCodeForTokensAsync(code);
+
+                // 2. Extrage adresa de Gmail conectată
+                var userEmail = await _googleAuthService.GetUserEmailAsync(tokens.AccessToken);
+
+                long userId = long.Parse(state);
+
+                // 3. Aici salvezi în baza de date (ex: via DbContext sau Repository):
+                // var account = new UserEmailAccount {
+                //     UserId = userId,
+                //     EmailAddress = userEmail,
+                //     Provider = "Google",
+                //     RefreshToken = tokens.RefreshToken, // Criptat
+                //     AccessToken = tokens.AccessToken,
+                //     ExpiresAtUtc = DateTime.UtcNow.AddSeconds(tokens.ExpiresIn)
+                // };
+                // await _accountRepo.SaveAsync(account, ct);
+
+                return Ok(new
                 {
-                    // 1. Schimbă codul pe tokens
-                    var tokens = await _googleAuthService.ExchangeCodeForTokensAsync(code);
-
-                    // 2. Extrage adresa de Gmail conectată
-                    var userEmail = await _googleAuthService.GetUserEmailAsync(tokens.AccessToken);
-
-                    long userId = long.Parse(state);
-
-                    // 3. Aici salvezi în baza de date (ex: via DbContext sau Repository):
-                    // var account = new UserEmailAccount {
-                    //     UserId = userId,
-                    //     EmailAddress = userEmail,
-                    //     Provider = "Google",
-                    //     RefreshToken = tokens.RefreshToken, // Criptat
-                    //     AccessToken = tokens.AccessToken,
-                    //     ExpiresAtUtc = DateTime.UtcNow.AddSeconds(tokens.ExpiresIn)
-                    // };
-                    // await _accountRepo.SaveAsync(account, ct);
-
-                    return Ok(new
-                    {
-                        Message = "Cont Google conectat cu succes!",
-                        UserId = userId,
-                        ConnectedEmail = userEmail,
-                        HasRefreshToken = !string.IsNullOrEmpty(tokens.RefreshToken),
-                        ExpiresInSeconds = tokens.ExpiresIn
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Eroare la autorizare.");
-                    return StatusCode(500, new { Error = ex.Message });
-                }
+                    Message = "Cont Google conectat cu succes!",
+                    UserId = userId,
+                    ConnectedEmail = userEmail,
+                    HasRefreshToken = !string.IsNullOrEmpty(tokens.RefreshToken),
+                    ExpiresInSeconds = tokens.ExpiresIn
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Eroare la autorizare.");
+                return StatusCode(500, new { Error = ex.Message });
+            }
         }
 
     }
 }
-       
-  
+
+
 
