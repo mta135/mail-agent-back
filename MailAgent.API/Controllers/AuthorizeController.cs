@@ -43,10 +43,10 @@ namespace MailAgent.API.Controllers
                 try
                 {
                     // 1. Schimbă codul pe tokens
-                    var tokens = await _googleAuthService.ExchangeCodeForTokensAsync(code, ct);
+                    var tokens = await _googleAuthService.ExchangeCodeForTokensAsync(code);
 
                     // 2. Extrage adresa de Gmail conectată
-                    var userEmail = await _googleAuthService.GetUserEmailAsync(tokens.AccessToken, ct);
+                    var userEmail = await _googleAuthService.GetUserEmailAsync(tokens.AccessToken);
 
                     long userId = long.Parse(state);
 

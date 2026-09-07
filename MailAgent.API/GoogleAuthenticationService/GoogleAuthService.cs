@@ -17,10 +17,7 @@ namespace MailAgent.API.Services
 
         public string BuildAuthorizationUrl(long userId)
         {
-            // access_type=offline -> Google generează Refresh Token
-            // prompt=consent      -> Forțează afișarea ecranului de aprobare (pentru a primi sigur Refresh Token)
-            // state               -> Trimitem userId-ul criptat sau ca identificator pentru a ști al cui cont este la callback
-            var parameters = new Dictionary<string, string>
+            Dictionary<string, string> parameters = new Dictionary<string, string>
             {
                 ["client_id"] = _options.ClientId,
                 ["redirect_uri"] = _options.RedirectUri,
@@ -31,15 +28,15 @@ namespace MailAgent.API.Services
                 ["state"] = userId.ToString()
             };
 
-            var queryString = string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
+            string queryString = string.Join("&", parameters.Select(p => $"{p.Key}={Uri.EscapeDataString(p.Value)}"));
             return $"https://accounts.google.com/o/oauth2/v2/auth?{queryString}";
         }
 
-        public async Task<GoogleTokenResponse> ExchangeCodeForTokensAsync(string code, CancellationToken ct = default)
+        public async Task<GoogleTokenResponse> ExchangeCodeForTokensAsync(string code)
         {
             var client = _httpClientFactory.CreateClient();
 
-            var body = new Dictionary<string, string>
+            Dictionary<string, string> body = new()
             {
                 ["code"] = code,
                 ["client_id"] = _options.ClientId,
@@ -48,12 +45,12 @@ namespace MailAgent.API.Services
                 ["grant_type"] = "authorization_code"
             };
 
-            var response = await client.PostAsync("https://oauth2.googleapis.com/token", new FormUrlEncodedContent(body), ct);
+            HttpResponseMessage response = await client.PostAsync("https://oauth2.googleapis.com/token", new FormUrlEncodedContent(body));
 
             response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync(ct);
-            var tokenResult = JsonSerializer.Deserialize<GoogleTokenPayload>(json);
+            string json = await response.Content.ReadAsStringAsync();
+            GoogleTokenPayload? tokenResult = JsonSerializer.Deserialize<GoogleTokenPayload>(json);
 
             if (tokenResult is null || string.IsNullOrEmpty(tokenResult.AccessToken))
             {
@@ -65,17 +62,17 @@ namespace MailAgent.API.Services
 
 
 
-        public async Task<string> GetUserEmailAsync(string accessToken, CancellationToken ct = default)
+        public async Task<string> GetUserEmailAsync(string accessToken)
         {
-            var client = _httpClientFactory.CreateClient();
-            using var request = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/oauth2/v2/userinfo");
+            HttpClient? client = _httpClientFactory.CreateClient();
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://www.googleapis.com/oauth2/v2/userinfo");
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-            var response = await client.SendAsync(request, ct);
+            HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync(ct);
-            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            string json = await response.Content.ReadAsStringAsync();
+            using JsonDocument doc = System.Text.Json.JsonDocument.Parse(json);
 
             return doc.RootElement.GetProperty("email").GetString() ?? throw new InvalidOperationException("Emailul nu a putut fi extras din profilul Google.");
         }
