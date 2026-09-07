@@ -23,15 +23,23 @@ namespace MailAgent.Application.EmailProcesBackgroundWorker.ReceiveWorker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var scope = _scopeFactory.CreateScope();
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
 
-            IEmailMessageRepository repository = scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
-            IEmailSender emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+                IEmailMessageRepository repository = scope.ServiceProvider.GetRequiredService<IEmailMessageRepository>();
+                IEmailSender emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
 
 
-            await emailSender.ReceiveEmailAsync(stoppingToken);
+                await emailSender.ReceiveEmailAsync(stoppingToken);
 
-            throw new NotImplementedException();
+                throw new NotImplementedException();
+
+            }
+            catch (Exception ex)
+            {
+            }
+
         }
     }
 }
