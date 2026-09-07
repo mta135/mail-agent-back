@@ -1,3 +1,4 @@
+﻿using MailAgent.API.Services;
 using MailAgent.Application.EmailProcesBackgroundWorker.ReceiveWorker;
 using MailAgent.Application.EmailProcessingBackgroundWorker.SendWorker;
 using MailAgent.Application.MessagingService;
@@ -6,6 +7,7 @@ using MailAgent.Application.Service.Abstract;
 using MailAgent.DataBaseAccess.Contex;
 using MailAgent.DataBaseAccess.Repositories.Abstract;
 using MailAgent.DataBaseAccess.Repositories.Real;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
@@ -20,6 +22,12 @@ builder.Services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
 
 builder.Services.AddScoped<IEmailMessageService, EmailMessageService>();
 builder.Services.AddScoped<IEmailSender, MailKitEmailSender>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+
+
+builder.Services.Configure<GoogleOAuthOptions>(builder.Configuration.GetSection(GoogleOAuthOptions.SectionName));
+builder.Services.AddHttpClient();
+
 
 
 builder.Services.AddDbContext<MailAgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("MailAgent")));
@@ -43,7 +51,7 @@ builder.Services.AddSwaggerGen(c =>
         Description = "FFAppMiddleware Project. ASP.NET Web API",
         Contact = new OpenApiContact
         {
-            Name = ".Net Developer: Mihai Tamazl�caru",
+            Name = ".Net Developer: Mihai Tamazlîcaru",
             Email = string.Empty,
             Url = new Uri("https://twitter.com/spboyer"),
         },
