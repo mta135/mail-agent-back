@@ -28,7 +28,7 @@ namespace MailAgent.Application.Service
             {
                 emailId = Guid.NewGuid();
 
-                EmailMessage emailMessage = new EmailMessage
+                EmailMessage emailMessage = new()
                 {
                     Id = emailId,
 
@@ -90,7 +90,6 @@ namespace MailAgent.Application.Service
             // Numele fișierului dacă ai nevoie de file_name:
             string fileName = Path.GetFileName(file.FileName);
 
-            // Mapezi direct în entitatea ta de EF Core:
             var attachmentEntity = new EmailMessageAttachment
             {
                 EmailMessageId = emailId,
