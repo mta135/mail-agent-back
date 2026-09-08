@@ -61,8 +61,6 @@ namespace MailAgent.API.Services
             return new GoogleTokenResponse(tokenResult.AccessToken, tokenResult.ExpiresIn, tokenResult.RefreshToken, tokenResult.Scope, tokenResult.TokenType);
         }
 
-
-
         public async Task<string> GetUserEmailAsync(string accessToken)
         {
             HttpClient? client = _httpClientFactory.CreateClient();

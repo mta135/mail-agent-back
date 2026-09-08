@@ -40,7 +40,6 @@ namespace MailAgent.API.Controllers
                 return BadRequest("Codul de autorizare lipsește din răspunsul Google.");
             }
 
-
             try
             {
                 // 1. Schimbă codul pe tokens
