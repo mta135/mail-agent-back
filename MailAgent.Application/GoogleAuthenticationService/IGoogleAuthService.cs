@@ -8,6 +8,7 @@ namespace MailAgent.Application.GoogleAuthenticationService
     public interface IGoogleAuthService
     {
         string BuildAuthorizationUrl(long userId);
+
         Task<GoogleTokenResponse> ExchangeCodeForTokensAsync(string code);
 
         Task<string> GetUserEmailAsync(string accessToken);

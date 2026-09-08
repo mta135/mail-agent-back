@@ -76,7 +76,6 @@ namespace MailAgent.Application.Service
 
         public async Task<EmailMessageAttachment> ProcessFileAsync(IFormFile file, Guid emailId)
         {
-
             string contentType = file.ContentType;
 
             long fileSizeBytes = file.Length;
